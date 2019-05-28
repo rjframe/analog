@@ -1,0 +1,12 @@
+{
+	"authors": [
+		"Ryan Frame"
+	],
+	"copyright": "Copyright © 2019, Ryan Frame",
+	"description": "Multi-platform standard logging library.",
+	"license": "MIT",
+	"name": "analog",
+    "dependencies": {
+        "gelfd": "~>1.3.3"
+    }
+}
