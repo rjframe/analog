@@ -1,15 +1,11 @@
 module analog.log;
 
-// TODO: Can I statically take logger choices and create loggers without
-// instantiating any structs/classes? Is that even a good idea?
-
-
 // TODO: Supported backends: syslog, GELF, systemd journal, Windows eventlog
 // syslog will silently ignore elements it won't support, unless an alternative
 // output method is provided (e.g., stack traces to a separate file).
 // TODO: Create std.experimental.logger-compatible interface?
 
-// TODO: Make this empty and use CT checks - would be more flexible w/
+// TODO: Make this empty and use CT checks? - would be more flexible w/
 // templated methods, accepting non-strings, etc.
 interface Logger {
     void trace(string msg, string extra = "");
@@ -34,6 +30,77 @@ void log(Log level)(string msg) {
     import std.conv : to;
     import std.uni : toLower;
     mixin(level.to!string.toLower() ~ "(msg);");
+}
+
+void setLevel(Log level) {
+    foreach (l; loggers) {
+        l.level = level;
+    }
+}
+
+@("Set the level for all loggers")
+unittest {
+    import std.conv : text;
+    import analog.mixins;
+
+    class LogA : Logger {
+        mixin(GenProperty!Log("level"));
+        mixin(GenLogWriterMethods());
+        nothrow void write(Log level)(string msg, string extra = "") {}
+        this() { _level = Log.Info; }
+    }
+    class LogB : Logger {
+        mixin(GenProperty!Log("level"));
+        mixin(GenLogWriterMethods());
+        nothrow void write(Log level)(string msg, string extra = "") {}
+        this() { _level = Log.Info; }
+    }
+
+    auto a = new LogA();
+    auto b = new LogB();
+    loggers ~= a;
+    loggers ~= b;
+
+    setLevel(Log.Warning);
+    assert(a.level == Log.Warning, "A: " ~ a.level.text);
+    assert(b.level == Log.Warning, "B: " ~ a.level.text);
+}
+
+/** Change the level of loggers of the specified type. */
+void setLevel(L)(Log level) if (is(L : Logger)) {
+    foreach (logger; loggers) {
+        if (auto l = cast(L) logger) {
+            l.level = level;
+        }
+    }
+}
+
+@("Set the level for loggers of the specified type")
+unittest {
+    import std.conv : text;
+    import analog.mixins;
+
+    class LogA : Logger {
+        mixin(GenProperty!Log("level"));
+        mixin(GenLogWriterMethods());
+        nothrow void write(Log level)(string msg, string extra = "") {}
+        this() { _level = Log.Info; }
+    }
+    class LogB : Logger {
+        mixin(GenProperty!Log("level"));
+        mixin(GenLogWriterMethods());
+        nothrow void write(Log level)(string msg, string extra = "") {}
+        this() { _level = Log.Info; }
+    }
+
+    auto a = new LogA();
+    auto b = new LogB();
+    loggers ~= a;
+    loggers ~= b;
+
+    setLevel!LogB(Log.Warning);
+    assert(a.level == Log.Info, "A: " ~ a.level.text);
+    assert(b.level == Log.Warning, "B: " ~ b.level.text);
 }
 
 mixin(GenWriterMethods());
