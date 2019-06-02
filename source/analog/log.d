@@ -17,6 +17,8 @@ interface Logger {
     void warning(string msg, string extra = "");
     void critical(string msg, string extra = "");
     void fatal(string msg, string extra = "");
+    @property void level(Log level);
+    @property Log level();
 }
 
 enum Log {

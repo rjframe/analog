@@ -38,8 +38,9 @@ class Gelflogger : Logger {
         this._level = level;
     }
 
-    import analog.mixins : GenLogWriterMethods;
-    mixin(GenLogWriterMethods());
+    import analog.mixins : GenProperty, GenLogWriterMethods, WriterPolicy;
+    mixin(GenProperty!Log("level"));
+    mixin(GenLogWriterMethods!(WriterPolicy.Throwable));
 
     @property
     uint chunkAt() { return this.chunkSize; }
@@ -79,7 +80,6 @@ class Gelflogger : Logger {
     string source = "";
     string server = "";
     uint chunkSize = UdpMaxPacketBytes;
-    Log _level;
     ushort port = 12201;
     bool compress = false;
 

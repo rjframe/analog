@@ -31,12 +31,8 @@ class Syslogger : Logger {
 
     ~this() { closelog(); }
 
-    @property
-    Log level() { return this._level; }
-    @property
-    void level(Log level) { this._level = level; }
-
-    import analog.mixins : GenLogWriterMethods;
+    import analog.mixins : GenProperty, GenLogWriterMethods;
+    mixin(GenProperty!Log("level"));
     mixin(GenLogWriterMethods());
 
     private:
@@ -53,7 +49,6 @@ class Syslogger : Logger {
     immutable(char)* ident = null;
     int options = 0;
     int facility = 0;
-    Log _level;
 
     enum int[Log] priorityMap = [
         Log.Trace: LOG_DEBUG,
