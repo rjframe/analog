@@ -37,10 +37,15 @@ class Syslogger : Logger {
 
     private:
 
-    void write(Log level)(string msg, string extra = "") {
+    nothrow
+    void write(Log level)(string msg, string extra = "") in {
         // TODO: Check for 1024 byte max message size, other constraints.
-        // TODO: Append extra to msg if within limit; or have separate
-        // log file?
+        // Or just ignore anything past that, since the other loggers won't have
+        // this constraint.
+        // Probably: send multiple messages to syslog at the 1024-byte obundary.
+        // "extra" also goes as separate messages.
+        // Maybe allow taking a lambda so the application can choose what to do.
+    } do {
         if (level >= this._level) {
             syslog(priorityMap[level], msg.toStringz());
         }
