@@ -3,7 +3,6 @@ module analog.log;
 // TODO: Supported backends: syslog, GELF, systemd journal, Windows eventlog
 // syslog will silently ignore elements it won't support, unless an alternative
 // output method is provided (e.g., stack traces to a separate file).
-// TODO: Create std.experimental.logger-compatible interface?
 
 // TODO: Make this empty and use CT checks? - would be more flexible w/
 // templated methods, accepting non-strings, etc.
@@ -112,9 +111,15 @@ unittest {
 }
 
 Logger[] loggers;
+Logger backupLogger;
+
+static this() {
+    backupLogger = new NullLogger();
+}
 
 private:
 
+// TODO: I want all of these to be nothrow.
 static string GenWriterMethods()() {
     import std.conv : to;
     import std.traits : EnumMembers;
@@ -131,3 +136,10 @@ static string GenWriterMethods()() {
     return ret;
 }
 
+class NullLogger : Logger {
+    import analog.mixins : GenProperty, GenLogWriterMethods;
+    mixin(GenProperty!Log("level"));
+    mixin(GenLogWriterMethods());
+
+    nothrow void write(Log level)(string msg, string extra = "") {}
+}
