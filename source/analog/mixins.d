@@ -37,20 +37,30 @@ static string GenLogWriterMethods(WriterPolicy Policy = WriterPolicy.NoThrow)() 
     return ret;
 }
 
-/** Generate a read-write property of the provided type with the specified name.
 
-    The property's visibility will be determined by the current access specifier
-    section.
+enum PropertyType {
+    Read,
+    Write,
+    ReadWrite
+}
+
+/** Generate a property of the provided type with the specified name.
+
+    The property's visibility will be determined by the access of declared
+    fields in the mixin's position.
 
     A private member of the same name, prefixed with an underscore, will also be
     generated.
 */
-static string GenProperty(T)(string name) {
-    return
-        "private " ~ T.stringof ~ " _" ~ name ~ ";\n"
+static string GenProperty(T, alias Type = PropertyType.ReadWrite)(string name) {
+    auto ret = "private " ~ T.stringof ~ " _" ~ name ~ ";\n";
 
-      ~ "@property " ~ T.stringof ~ " " ~ name ~ "() { return this._" ~ name ~ "; }\n"
-
-      ~ "@property void " ~ name ~ "(" ~ T.stringof ~ " " ~ name
-      ~ ") { this._" ~ name ~ " = " ~ name ~ "; }\n\n";
+    if (Type == PropertyType.Read || Type == PropertyType.ReadWrite) {
+        ret ~= "@property " ~ T.stringof ~ " " ~ name ~ "() { return this._" ~ name ~ "; }\n";
+    }
+    if (Type == PropertyType.Write || Type == PropertyType.ReadWrite) {
+        ret ~= "@property void " ~ name ~ "(" ~ T.stringof ~ " " ~ name
+             ~ ") { this._" ~ name ~ " = " ~ name ~ "; }\n";
+    }
+    return ret;
 }
