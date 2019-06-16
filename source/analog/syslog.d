@@ -12,6 +12,7 @@ unittest {
     l.warning("warning");
 }
 
+// TODO: Make this a final class?
 class Syslogger : Logger {
     import std.string : toStringz;
 
@@ -21,12 +22,9 @@ class Syslogger : Logger {
             int options = LOG_CONS | LOG_NDELAY | LOG_PID,
             int facility = LOG_LOCAL0,
             Log level = Log.Info) {
-        this.ident = appname.toStringz;
-        this.options = options;
-        this.facility = facility;
         this._level = level;
 
-        openlog(ident, options, facility);
+        openlog(appname.toStringz, options, facility);
     }
 
     ~this() { closelog(); }
@@ -50,10 +48,6 @@ class Syslogger : Logger {
             syslog(priorityMap[level], msg.toStringz());
         }
     }
-
-    immutable(char)* ident = null;
-    int options = 0;
-    int facility = 0;
 
     enum int[Log] priorityMap = [
         Log.Trace: LOG_DEBUG,
