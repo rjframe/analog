@@ -7,24 +7,24 @@ You can easily output to multiple logs, and create or wrap your own loggers.
 ## Current System Support
 
 Linux:
-    - [x] syslog
-    - [ ] systemd journal
-    - [x] GELF
+- [x] syslog
+- [ ] systemd journal
+- [x] GELF
 
 Windows:
-    - [ ] Windows Event Log
-    - [ ] Remote syslog
-    - [?] GELF (untested)
+- [ ] Windows Event Log
+- [ ] Remote syslog
+- [?] GELF (untested)
 
 macOS:
-    - [ ] Apple unified logger (10.12+ (Sierra))
-    - [ ] Local syslog? (does Apple still support it?)
-    - [ ] Remote syslog
-    - [?] GELF (untested)
+- [ ] Apple unified logger (10.12+ (Sierra))
+- [ ] Local syslog? (does Apple still support it?)
+- [ ] Remote syslog
+- [?] GELF (untested)
 
 BSD:
-    - [?] syslog (untested)
-    - [?] GELF (untested)
+- [?] syslog (untested)
+- [?] GELF (untested)
 
 ## Example Usage
 
@@ -46,7 +46,7 @@ log.setLevel(Log.Error);
 // Or just one type:
 log.setLevel!(log.Syslogger)(Log.Info);
 
-log.error("Only GELF will log this. Syslog won't see it.");
+log.warn("Only Syslog will log this. Gelf won't receive it.");
 ```
 
 If you know you only want one logger, you can just deal with it directly.
