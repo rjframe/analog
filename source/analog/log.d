@@ -104,10 +104,12 @@ unittest {
 
 mixin(GenWriterMethods());
 
-unittest {
-    import log = analog;
-    log.loggers ~= new log.Syslogger("myappname");
-    log.info("Logged message.");
+version(Posix) {
+    unittest {
+        import log = analog;
+        log.loggers ~= new log.Syslogger("myappname");
+        log.info("Logged message.");
+    }
 }
 
 Logger[] loggers;
